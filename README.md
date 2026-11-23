@@ -32,9 +32,10 @@ Name: Nguyễn Thành Nhân
         .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; }
         .close-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; }
         .cart-items { flex-grow: 1; overflow-y: auto; margin: 15px 0; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
-        .qty-controls { display: flex; align-items: center; }
-        .qty-controls button { padding: 2px 8px; margin: 0 5px; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; gap: 10px; }
+        .qty-controls { display: flex; align-items: center; white-space: nowrap; }
+        .qty-controls button { padding: 4px 10px; margin: 0 5px; cursor: pointer; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 4px; font-weight: bold; }
+        .qty-controls button:hover { background: #e2e8f0; }
         .cart-footer { border-top: 1px solid #e2e8f0; padding-top: 15px; }
         .total { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; }
         .checkout-btn { width: 100%; padding: 12px; background: #16a34a; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; }
@@ -61,7 +62,7 @@ Name: Nguyễn Thành Nhân
         <div class="product-grid" id="productList"></div>
     </main>
 
-    <div class="cart-modal" id="cartModal">
+    <div class="cart-modal" id="cartModal" onclick="if(event.target === this) toggleCart()">
         <div class="cart-content">
             <div class="cart-header">
                 <h2>Giỏ hàng của bạn</h2>
@@ -130,44 +131,57 @@ Name: Nguyễn Thành Nhân
             const item = cart.find(i => i.id === id);
             if (!item) return;
             item.qty += delta;
-            if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            }
             saveCart();
             updateCartUI();
         }
 
         function updateCartUI() {
-            document.getElementById('cartCount').textContent = cart.reduce((s, i) => s + i.qty, 0);
-            document.getElementById('cartTotal').textContent = formatPrice(cart.reduce((s, i) => s + i.price * i.qty, 0));
-            const el = document.getElementById('cartItems');
-            el.innerHTML = cart.length ? cart.map(i => `
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+
+            cartCount.innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p style="text-align:center;color:#64748b;margin-top:40px;">Giỏ hàng của bạn đang trống.</p>';
+                cartTotal.innerText = '0 ₫';
+                return;
+            }
+
+            cartItems.innerHTML = cart.map(item => `
                 <div class="cart-item">
                     <div>
-                        <div style="font-weight:600;">${i.name}</div>
-                        <div style="color:#e11d48;font-size:0.9rem;">${formatPrice(i.price)}</div>
+                        <div style="font-weight:600;margin-bottom:4px;">${item.name}</div>
+                        <div style="color:#e11d48;font-size:0.9rem;">${formatPrice(item.price)}</div>
                     </div>
                     <div class="qty-controls">
-                        <button onclick="changeQty(${i.id}, -1)">-</button>
-                        <span>${i.qty}</span>
-                        <button onclick="changeQty(${i.id}, 1)">+</button>
-                    </div>
-                </div>
-            `).join('') : '<p style="text-align:center;color:#94a3b8;margin-top:30px;">Giỏ hàng đang trống.</p>';
-        }
+-
+${item.qty}
++
 
-        function toggleCart() {
-            const m = document.getElementById('cartModal');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-        }
 
-window.onclick = (e) => { if (e.target === document.getElementById('cartModal')) toggleCart(); };
+`).join('');
+const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+cartTotal.innerText = formatPrice(total);
+}
+function toggleCart() {
+const modal = document.getElementById('cartModal');
+modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+}
 function checkout() {
-if (!cart.length) return alert('Giỏ hàng của bạn đang trống!');
-alert('Cảm ơn bạn đã đặt hàng tại TechStore! Đơn hàng đang được xử lý.');
+if (cart.length === 0) {
+alert('Giỏ hàng đang trống, vui lòng chọn sản phẩm!');
+return;
+}
+alert('Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại TechStore.');
 cart = [];
 saveCart();
 updateCartUI();
 toggleCart();
 }
+// Khởi tạo giao diện ban đầu
 renderProducts();
 updateCartUI();
-
