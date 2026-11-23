@@ -1,5 +1,3 @@
-# -index.html
-Name: Nguyễn Thành Nhân
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -156,9 +154,7 @@ Name: Nguyễn Thành Nhân
                     <div>
                         <div style="font-weight:600;margin-bottom:4px;">${item.name}</div>
                         <div style="color:#e11d48;font-size:0.9rem;">${formatPrice(item.price)}</div>
-                    </div>
-                    <div class="qty-controls">
--
+                        -
 ${item.qty}
 +
 
@@ -182,6 +178,9 @@ saveCart();
 updateCartUI();
 toggleCart();
 }
-
 renderProducts();
 updateCartUI();
+
+
+                    </div>
+                    <div class="qty-controls">
