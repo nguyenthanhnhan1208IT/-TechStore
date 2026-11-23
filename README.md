@@ -182,6 +182,6 @@ saveCart();
 updateCartUI();
 toggleCart();
 }
-// Khởi tạo giao diện ban đầu
+
 renderProducts();
 updateCartUI();
